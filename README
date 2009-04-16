@@ -1,0 +1,8 @@
+blktest is a simple tool to test block devices for read/write errors.
+It will kill all data while doing so.
+
+Its a bit like h2testw <http://www.heise.de/software/download/h2testw/50539>
+but a lot simpler and without a GUI.
+
+Usage:
+  blktest /dev/sdx

@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -e
+export LC_ALL=C
+
+idev=/dev/urandom
+odev=$1
+[ "$odev" ]
+
+
+echo ALL DATA ON $odev WILL BE LOST
+echo Starting in 5 seconds...
+read -t 5 || true
+
+temp=$(tempfile -p blkt. -s .md5)
+trap "rm -f $temp" EXIT
+
+size=$(fdisk -lu "$odev" | sed -e '/^Disk.*bytes$/!d' -e 's/.* \([0-9]*\) bytes/\1/')
+[ "$size" ] 
+
+blks=512
+blkc=$(($size / $blks))
+
+echo Writing pattern to $odev...
+dd if="$idev" bs=$blks count=$blkc 2>/dev/null \
+  | pv -s $size \
+  | tee >(md5sum -b > $temp) \
+  | dd of="$odev" bs=$blks count=$blkc 2>/dev/null
+echo Verifying pattern...
+dd if="$odev" bs=$blks count=$blkc 2>/dev/null \
+  | pv -s $size \
+  | md5sum -c $temp \
+  | sed -e 's/^-/Result/'
+
