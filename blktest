@@ -15,7 +15,7 @@ read -t 5 || true
 temp=$(tempfile -p blkt. -s .md5)
 trap "rm -f $temp" EXIT
 
-size=$(fdisk -lu "$odev" | sed -e '/^Disk.*bytes$/!d' -e 's/.* \([0-9]*\) bytes/\1/')
+size=$(fdisk -lu "$odev" | sed -e '/^Disk .* bytes/!d' -e 's/^.* \([0-9]*\) bytes.*$/\1/')
 [ "$size" ] 
 
 blks=512
